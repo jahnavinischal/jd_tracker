@@ -1,0 +1,9 @@
+data/
+raw/
+logs/
+.venv/
+uv.lock
+__pycache__/
+*.pyc
+.env
+.pytest_cache/

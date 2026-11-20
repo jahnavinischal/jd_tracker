@@ -1,0 +1,176 @@
+# ---------------------------------------------------------------------------
+# Companies to watch.
+#
+# `ats` is one of: greenhouse, lever, ashby, smartrecruiters, workable, workday,
+#                  oracle, eightfold, amazonjobs, microsoft
+#
+# To identify a company's ATS: open its careers page, DevTools -> Network -> XHR,
+# and see which domain serves the job list.
+# ---------------------------------------------------------------------------
+
+companies:
+  # ---- verified working ---------------------------------------------------
+  - name: Amazon
+    ats: amazonjobs
+    countries: [IND]            # server-side filter; omit at your peril (30k+ roles)
+
+  - name: NVIDIA
+    ats: workday
+    slug: nvidia
+    host: wd5
+    site: NVIDIAExternalCareerSite
+    # NVIDIA's board hits Workday's 2000-posting cap, which hides India roles.
+    # Fetching per search term and unioning the results gets under the cap.
+    search: ["data scientist", "machine learning", "deep learning", "analytics",
+             "data engineer", "AI", "research scientist"]
+
+  - name: Genpact
+    ats: workday
+    slug: genpact
+    host: wd108
+    site: External_Careers
+
+  - name: The Hartford
+    ats: workday
+    slug: thehartford
+    host: wd5
+    site: Careers_External
+
+  - name: Chubb
+    ats: oracle
+    host: fa-ewgu-saasfaprod1.fa.ocs.oraclecloud.com
+    site: CX_2001
+    site_number: CX_2001
+
+  - name: Uber
+    ats: oracle
+    host: iaziqy.fa.ocs.oraclecloud.com
+    site: UberCareers
+    site_number: CX_1001
+
+  - name: Netflix
+    ats: eightfold
+    host: explore.jobs.netflix.net
+    domain: netflix.com
+
+  - name: Meesho
+    ats: lever
+    slug: meesho
+
+  # ---- unverified from the build environment (TLS failure; test locally) ---
+  - name: Microsoft
+    ats: microsoft
+    locations: [India]
+
+  # ---- previously configured; keep or delete as you like ------------------
+  - name: Stripe
+    ats: greenhouse
+    slug: stripe
+
+  - name: Ramp
+    ats: ashby
+    slug: ramp
+
+  - name: Spotify
+    ats: lever
+    slug: spotify
+
+  # ---- NOT yet reachable; see README "Companies still unresolved" ---------
+  # Cognizant, Google, Apple, Meta, Myntra, HCLTech, Infosys, IndiGo
+
+# ---------------------------------------------------------------------------
+# Filters -- applied at notification time only. Everything is still stored,
+# so you can change these and re-run `--digest` over full history.
+# A posting must match title_include AND location_include to be reported.
+# ---------------------------------------------------------------------------
+filters:
+  title_include:
+    # data science / ML / AI core
+    - data scien
+    - machine learning
+    - "ml engineer"
+    - "ai engineer"
+    - "ai/ml"
+    - deep learning
+    - applied scientist
+    - research scientist
+    - nlp
+    - natural language
+    - computer vision
+    - generative ai
+    - genai
+    - llm
+    - mlops
+    - "ai research"
+    # adjacent and common entry points
+    - data analyst
+    - data engineer
+    - analytics
+    - business intelligence
+    - decision scientist
+    - quantitative
+
+  # Regex form, for short tokens that would false-match as substrings
+  # ("ai" is inside "maintenance", "ml" inside "html").
+  title_include_regex:
+    - '\bai\b'
+    - '\bml\b'
+    - '\bai[/ -]?ml\b'
+    - '\bllm[s]?\b'
+    - '\bnlp\b'
+    - '\bgen[ -]?ai\b'
+    - '\bcv\b'
+    - '\bbi\b'
+
+  title_exclude:
+    # above your level (~4 yrs: 1 internship + 3 working)
+    - staff
+    - principal
+    - director
+    - "vice president"
+    - " vp"
+    - head of
+    - chief
+    - distinguished
+    - fellow
+    - manager
+    - architect
+    - "sr. manager"
+    # not applicable
+    - intern
+    - internship
+    - apprentice
+    - contract
+
+  title_exclude_regex:
+    - '\bsr\.?\s*(manager|director)\b'
+    - '\bL[6-9]\b'          # Netflix/Google-style senior level markers
+    - '\bIV\b|\bV\b|\bVI\b' # roman-numeral seniority (Scientist IV and up)
+
+  location_include:
+    - india
+    - delhi
+    - ncr
+    - noida
+    - gurgaon
+    - gurugram
+    - bangalore
+    - bengaluru
+    - mumbai
+    - hyderabad
+    - pune
+    - chennai
+    - kolkata
+    - ahmedabad
+    - remote            # matches remote anywhere, including outside India
+
+  location_exclude: []
+  department_exclude: []
+
+# Per-company overrides replace individual filter keys, e.g.
+#
+#   - name: Meesho
+#     ats: lever
+#     slug: meesho
+#     filters:
+#       location_include: []     # Meesho is India-only anyway
